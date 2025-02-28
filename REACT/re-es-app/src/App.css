@@ -1,5 +1,17 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #252525; /* Yellow-goldish gradient */
+}
+
 .App {
-  text-align: center;
+  outline: 2px solid black; /* Optional: Add an outline for visibility */
+  padding: 20px; /* Optional: Add some padding */
+  border-radius: 15px; /* Adjust the radius as needed */
+  background-color: #fcba03; /* Light grey background */
 }
 
 .App-logo {
@@ -28,11 +40,19 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.inline-elements {
+  display: flex;
+  align-items: center;
+}
+
+.inline-elements p {
+  margin: 0; /* Remove default margin */
+  margin-right: 10px; /* Adjust the spacing between the text and button */
+}
+
+
+Add styles for the Label component
+label {
+  color: #333; /* Dark grey color for contrast */
+  font-size: 1.2em; /* Adjust the font size as needed */
 }

@@ -1,23 +1,18 @@
-import logo from './logo.svg';
 import './App.css';
+import Label from './components/label';
+import TextInput from './components/textInput';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Label text="Username/ID:" size='3' color='#252525'/>
+      <TextInput phTxt="Enter Username/ID Here" isPass={false} />
+      <Label text="Password:" size='3' />
+      <TextInput phTxt="Enter Password Here" isPass={true} />
+      <div className="inline-elements">
+        <p>Forgot your password? too bad</p>
+        <button>Log In</button>
+      </div>
     </div>
   );
 }
