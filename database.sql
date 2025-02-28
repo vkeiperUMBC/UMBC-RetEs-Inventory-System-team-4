@@ -8,6 +8,7 @@ CREATE DATABASE retriever_essentials_data;
     max_weight = maximum weight of the item that a student can take
     max_amount = maximum amount of the item that a student can take
 */
+/*test for github*/
 CREATE TABLE items (
     item_name TINYTEXT(500),
     storage_quantity SMALLINT(255),
