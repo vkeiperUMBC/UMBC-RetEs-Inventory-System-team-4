@@ -4,7 +4,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #252525; /* Yellow-goldish gradient */
+  background: #ffffff /* Yellow-goldish gradient */
 }
 
 .App {
