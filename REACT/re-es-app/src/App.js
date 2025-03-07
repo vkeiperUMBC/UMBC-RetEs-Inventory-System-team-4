@@ -5,7 +5,7 @@ import { Login } from './pages/login';
 import { SqlTest } from './pages/sqltest';
 import { ShadowTest } from './pages/shadowTest';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Inventory from './pages/inventory';
+import { Inventory } from './pages/inventory';
 
 const theme = createTheme({
   palette: {
@@ -29,10 +29,7 @@ function App() {
         </Routes>
       </Router>
     </ThemeProvider>
-
   );
-
-
 }
 
 export default App;

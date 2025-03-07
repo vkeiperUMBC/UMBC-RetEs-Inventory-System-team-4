@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box, AppBar, Toolbar, Typography } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useNavigate } from 'react-router-dom';
 
 export function Inventory() {
+    const navigate = useNavigate();
+
     const createData = (name, stock, maxWithdraw) => {
         return { name, stock, maxWithdraw, userInput: '' };
     };
@@ -42,13 +45,20 @@ export function Inventory() {
         }
     };
 
+    const handleLogout = () => {
+        navigate('/');
+    };
+
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="h6">
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Logged in as: User123
                     </Typography>
+                    <Button color="inherit" onClick={handleLogout}>
+                        Logout
+                    </Button>
                 </Toolbar>
             </AppBar>
             <Box sx={{ width: '100%', maxWidth: 800, marginTop: 4 }}>
