@@ -1,4 +1,13 @@
 /* library of functions python will call */
+-- function to test connection
+DELIMITER $$
+CREATE FUNCTION `test_connection`() RETURNS TEXT
+BEGIN
+    -- make text file
+    SET @sql = 'echo "Connection successful" > test_connection.txt';
+    PREPARE stmt FROM @sql;
+END$$
+
 -- function to check if a database exists
 DELIMITER $$
 CREATE FUNCTION `check_database`(`db_name` TEXT) RETURNS INT
