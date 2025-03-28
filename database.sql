@@ -20,6 +20,11 @@ CREATE TABLE IF NOT EXISTS stored_previous (
     max_amount INTEGER
 );
 
+-- Functionality to output current table data
+
+CREATE VIEW current_database_view AS
+SELECT * FROM current_database;
+
 -- Functionality to add a row to the current_database
 -- This would be implemented in application logic, but here's an example SQL statement:
 -- INSERT INTO current_database (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount)
