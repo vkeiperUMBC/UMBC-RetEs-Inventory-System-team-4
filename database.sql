@@ -1,24 +1,30 @@
 -- Create the current_database table
-CREATE TABLE IF NOT EXISTS current_database (
-    item_name TEXT,
-    storage_quantity INTEGER,
-    num_sold INTEGER,
-    serving_weight REAL,
-    serving_amount INTEGER,
-    max_weight REAL,
-    max_amount INTEGER
-);
+CREATE PROCEDURE CreateCurrentDatabase()
+BEGIN
+    CREATE TABLE IF NOT EXISTS current_database (
+        item_name TEXT PRIMARY KEY,
+        storage_quantity INTEGER,
+        num_sold INTEGER,
+        serving_weight REAL,
+        serving_amount INTEGER,
+        max_weight REAL,
+        max_amount INTEGER
+    );
+END;
 
 -- Create the stored_previous table
-CREATE TABLE IF NOT EXISTS stored_previous (
-    item_name TEXT,
-    storage_quantity INTEGER,
-    num_sold INTEGER,
-    serving_weight REAL,
-    serving_amount INTEGER,
-    max_weight REAL,
-    max_amount INTEGER
-);
+CREATE PROCEDURE CreateStoredPrevious()
+BEGIN
+    CREATE TABLE IF NOT EXISTS stored_previous (
+        item_name TEXT PRIMARY KEY,
+        storage_quantity INTEGER,
+        num_sold INTEGER,
+        serving_weight REAL,
+        serving_amount INTEGER,
+        max_weight REAL,
+        max_amount INTEGER
+    );
+END;
 
 -- Functionality to output current table data
 
