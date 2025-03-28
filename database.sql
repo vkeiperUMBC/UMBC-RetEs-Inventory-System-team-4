@@ -36,8 +36,21 @@ CREATE PROCEDURE AddToCurrentDatabase(
     max_amount INTEGER
 )
 BEGIN
-    INSERT INTO current_database (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount)
-    VALUES (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount);
+    IF EXISTS (SELECT 1 FROM current_database WHERE item_name = item_name) THEN
+        UPDATE current_database
+        SET storage_quantity = storage_quantity + storage_quantity
+        WHERE item_name = item_name;
+    ELSE
+        INSERT INTO current_database (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount)
+        VALUES (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount);
+    END IF;
+END;
+
+-- Functionatlity to delete a row from the current_database
+
+CREATE PROCEDURE DeleteFromCurrentDatabase(item_name TEXT)
+BEGIN
+    DELETE FROM current_database WHERE item_name = item_name;
 END;
 
 -- Functionality to remove a row from current_database and add it to stored_previous
