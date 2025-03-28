@@ -1,10 +1,11 @@
--- dummy file that tests the connection to python
+-- Create a table to test the connection
+CREATE TABLE IF NOT EXISTS test_connection (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message TEXT
+);
 
-CREATE FUNCTION test_connection() RETURNS VARCHAR(255)
-BEGIN
-    -- make text file
-    DECLARE sql_command VARCHAR(255);
-    SET sql_command = 'echo "Connection successful" > test_connection.txt';
-    EXECUTE IMMEDIATE sql_command;
-    RETURN 'Connection successful';
-END;
+-- Insert a test message
+INSERT INTO test_connection (message) VALUES ('Connection successful');
+
+-- Query the table to verify the insertion
+SELECT * FROM test_connection;
