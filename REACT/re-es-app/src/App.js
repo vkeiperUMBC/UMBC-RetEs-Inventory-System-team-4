@@ -6,6 +6,8 @@ import { SqlTest } from './pages/sqltest';
 import { ShadowTest } from './pages/shadowTest';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Inventory } from './pages/inventory';
+import { InventoryAdmin } from './pages/inventoryAdmin';
+import { Analytics } from './pages/analytics';
 
 const theme = createTheme({
   palette: {
@@ -26,6 +28,8 @@ function App() {
           <Route path="/sqltest" element={<SqlTest />} />
           <Route path="/shadowTest" element={<ShadowTest />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventoryAdmin" element={<InventoryAdmin />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </Router>
     </ThemeProvider>

@@ -27,6 +27,9 @@ export function Login() {
                 <Link to="/inventory">
                     <button>Log In</button>
                 </Link>
+                <Link to="/inventoryAdmin">
+                    <button>Log AdmIn</button>
+                </Link>
 
             </div>
             <Link to="/sqltest">SQL Test</Link>
