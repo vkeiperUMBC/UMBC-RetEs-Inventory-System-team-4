@@ -25,6 +25,10 @@ export function InventoryAdmin() {
         createData('Cereal', 20, 10, 50, 25, 'Packaged Food'),
     ]);
 
+    const [initialRows, setInitialRows] = useState([...rows]); // Baseline state for comparison
+    const [modifiedFields, setModifiedFields] = useState({}); // Tracks modified fields
+    const [newlyAddedRows, setNewlyAddedRows] = useState([]); // Tracks newly added rows
+
     const [filters, setFilters] = useState({ searchQuery: '', selectedCategory: '' });
 
     const [openDialog, setOpenDialog] = useState(false);
@@ -38,21 +42,19 @@ export function InventoryAdmin() {
         category: '',
     });
 
-    const [modifiedFields, setModifiedFields] = useState({});
-    const [newlyAddedRows, setNewlyAddedRows] = useState([]);
-
     const handleInputChange = (index, field, value) => {
         const newRows = [...rows];
         const newValue = parseFloat(value) || 0;
 
-        // Track the modified field correctly
-        setModifiedFields((prev) => ({
-            ...prev,
-            [`${index}-${field}`]: newValue > rows[index][field] ? 'increased' : newValue < rows[index][field] ? 'decreased' : 'unchanged',
-        }));
-
         // Update the specific field
         newRows[index][field] = newValue;
+
+        // Track the modified field based on comparison with initialRows
+        setModifiedFields((prev) => ({
+            ...prev,
+            [`${index}-${field}`]: newValue > initialRows[index][field] ? 'increased' : newValue < initialRows[index][field] ? 'decreased' : 'unchanged',
+        }));
+
         setRows(newRows);
     };
 
@@ -94,6 +96,7 @@ export function InventoryAdmin() {
     const handleCommitChanges = () => {
         const confirmCommit = window.confirm('Are you sure you want to commit all changes?');
         if (confirmCommit) {
+            setInitialRows([...rows]); // Update the baseline state
             setModifiedFields({}); // Clear all modified fields
             setNewlyAddedRows([]); // Clear all newly added rows
             alert('Changes committed successfully!');

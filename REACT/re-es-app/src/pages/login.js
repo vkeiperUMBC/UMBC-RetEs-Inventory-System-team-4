@@ -1,41 +1,57 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-
-import Label from '../components/label';
-import TextInput from '../components/textInput';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import { Link } from 'react-router-dom';
-
 
 export function Login() {
     return (
         <Box
             sx={{
-                borderRadius: 1,
-                margin: 2,
-                padding: 2,
-                border: "1px solid #252525",
-                boxShadow: '3px 3px 10px rgba(0, 0, 0, 0.5)', // Updated boxShadow
-                bgcolor: 'primary.main',
+                width: 400,
+                margin: 'auto',
+                marginTop: 8,
+                padding: 4,
+                borderRadius: 2,
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                bgcolor: 'background.paper',
+                textAlign: 'center',
             }}
         >
-            <Label text="Username/ID:" size='3' color='#252525' />
-            <TextInput phTxt="Enter Username/ID Here" isPass={false} />
-            <Label text="Password:" size='3' />
-            <TextInput phTxt="Enter Password Here" isPass={true} />
-            <div className="inline-elements">
-                <p>Forgot your password? too bad</p>
-                <Link to="/inventory">
-                    <button>Log In</button>
+            <Typography variant="h5" sx={{ marginBottom: 2, fontWeight: 'bold', color: 'primary.main' }}>
+                Welcome to Retriever Essentials
+            </Typography>
+            <TextField
+                label="Username/ID"
+                variant="outlined"
+                fullWidth
+                sx={{ marginBottom: 2 }}
+            />
+            <TextField
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                sx={{ marginBottom: 3 }}
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Forgot your password?
+                </Typography>
+                <Link to="/inventory" style={{ textDecoration: 'none' }}>
+                    <Button variant="contained" color="primary">
+                        Log In
+                    </Button>
                 </Link>
-                <Link to="/inventoryAdmin">
-                    <button>Log AdmIn</button>
-                </Link>
-
-            </div>
-            <Link to="/sqltest">SQL Test</Link>
-            <Link to="/shadowTest">Shadow Test</Link>
+            </Box>
+            <Link to="/inventoryAdmin" style={{ textDecoration: 'none' }}>
+                <Button variant="outlined" color="primary" fullWidth>
+                    Admin Login
+                </Button>
+            </Link>
         </Box>
     );
-};
+}
 
 export default Login;
