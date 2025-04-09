@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box,
-    AppBar, Toolbar, Typography, Select, MenuItem, InputLabel, FormControl, Dialog, DialogActions, DialogContent, DialogTitle
+    AppBar, Toolbar, Typography, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,6 +38,41 @@ export function InventoryAdmin() {
         category: '',
     });
 
+    const [modifiedFields, setModifiedFields] = useState({});
+    const [newlyAddedRows, setNewlyAddedRows] = useState([]);
+
+    const handleInputChange = (index, field, value) => {
+        const newRows = [...rows];
+        const newValue = parseFloat(value) || 0;
+
+        // Track the modified field correctly
+        setModifiedFields((prev) => ({
+            ...prev,
+            [`${index}-${field}`]: newValue > rows[index][field] ? 'increased' : newValue < rows[index][field] ? 'decreased' : 'unchanged',
+        }));
+
+        // Update the specific field
+        newRows[index][field] = newValue;
+        setRows(newRows);
+    };
+
+    const getCellStyle = (index, field) => {
+        const key = `${index}-${field}`;
+        if (modifiedFields[key] === 'increased') {
+            return { backgroundColor: 'lightgreen' };
+        } else if (modifiedFields[key] === 'decreased') {
+            return { backgroundColor: 'lightcoral' };
+        }
+        return {};
+    };
+
+    const getRowStyle = (index) => {
+        if (newlyAddedRows.includes(index)) {
+            return { backgroundColor: 'lightgreen' };
+        }
+        return {};
+    };
+
     const handleAddItem = () => {
         setRows([...rows, createData(
             newItem.name,
@@ -47,12 +82,22 @@ export function InventoryAdmin() {
             parseFloat(newItem.maxWithdrawWeight),
             newItem.category
         )]);
+        setNewlyAddedRows([...newlyAddedRows, rows.length]); // Add the index of the new row
         setNewItem({ name: '', stock: '', maxWithdraw: '', stockWeight: '', maxWithdrawWeight: '', category: '' });
         setOpenDialog(false);
     };
 
     const handleLogout = () => {
         navigate('/');
+    };
+
+    const handleCommitChanges = () => {
+        const confirmCommit = window.confirm('Are you sure you want to commit all changes?');
+        if (confirmCommit) {
+            setModifiedFields({}); // Clear all modified fields
+            setNewlyAddedRows([]); // Clear all newly added rows
+            alert('Changes committed successfully!');
+        }
     };
 
     const filteredRows = rows.filter(row =>
@@ -114,50 +159,34 @@ export function InventoryAdmin() {
                         </TableHead>
                         <TableBody>
                             {filteredRows.map((row, index) => (
-                                <TableRow key={row.name}>
+                                <TableRow key={row.name} style={getRowStyle(index)}>
                                     <TableCell>{row.name}</TableCell>
-                                    <TableCell align="right">
+                                    <TableCell align="right" style={getCellStyle(index, 'stock')}>
                                         <TextField
                                             type="number"
                                             value={row.stock}
-                                            onChange={(e) => {
-                                                const newRows = [...rows];
-                                                newRows[index].stock = parseInt(e.target.value, 10) || 0;
-                                                setRows(newRows);
-                                            }}
+                                            onChange={(e) => handleInputChange(index, 'stock', e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
+                                    <TableCell align="right" style={getCellStyle(index, 'maxWithdraw')}>
                                         <TextField
                                             type="number"
                                             value={row.maxWithdraw}
-                                            onChange={(e) => {
-                                                const newRows = [...rows];
-                                                newRows[index].maxWithdraw = parseInt(e.target.value, 10) || 0;
-                                                setRows(newRows);
-                                            }}
+                                            onChange={(e) => handleInputChange(index, 'maxWithdraw', e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
+                                    <TableCell align="right" style={getCellStyle(index, 'stockWeight')}>
                                         <TextField
                                             type="number"
                                             value={row.stockWeight}
-                                            onChange={(e) => {
-                                                const newRows = [...rows];
-                                                newRows[index].stockWeight = parseFloat(e.target.value) || 0;
-                                                setRows(newRows);
-                                            }}
+                                            onChange={(e) => handleInputChange(index, 'stockWeight', e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
+                                    <TableCell align="right" style={getCellStyle(index, 'maxWithdrawWeight')}>
                                         <TextField
                                             type="number"
                                             value={row.maxWithdrawWeight}
-                                            onChange={(e) => {
-                                                const newRows = [...rows];
-                                                newRows[index].maxWithdrawWeight = parseFloat(e.target.value) || 0;
-                                                setRows(newRows);
-                                            }}
+                                            onChange={(e) => handleInputChange(index, 'maxWithdrawWeight', e.target.value)}
                                         />
                                     </TableCell>
                                     <TableCell>{row.category}</TableCell>
@@ -170,6 +199,15 @@ export function InventoryAdmin() {
                                                 if (confirmDelete) {
                                                     const newRows = rows.filter((_, i) => i !== index);
                                                     setRows(newRows);
+
+                                                    // Remove related modified fields
+                                                    const updatedModifiedFields = { ...modifiedFields };
+                                                    Object.keys(updatedModifiedFields).forEach((key) => {
+                                                        if (key.startsWith(`${index}-`)) {
+                                                            delete updatedModifiedFields[key];
+                                                        }
+                                                    });
+                                                    setModifiedFields(updatedModifiedFields);
                                                 }
                                             }}
                                         >
@@ -194,7 +232,7 @@ export function InventoryAdmin() {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => alert('Changes committed successfully!')}
+                        onClick={handleCommitChanges}
                     >
                         Commit Changes
                     </Button>
