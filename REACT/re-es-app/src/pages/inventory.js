@@ -1,22 +1,51 @@
 import React, { useState } from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box, AppBar, Toolbar, Typography, Switch, FormControlLabel } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box, AppBar, Toolbar, Typography, Switch, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
 
 export function Inventory() {
     const navigate = useNavigate();
 
-    const createData = (name, stock, maxWithdraw, stockWeight, maxWithdrawWeight) => {
-        return { name, stock, maxWithdraw, userInput: '', stockWeight, maxWithdrawWeight, userWeight: '' };
+    const createData = (name, stock, maxWithdraw, stockWeight, maxWithdrawWeight, category) => {
+        return { name, stock, maxWithdraw, userInput: '', stockWeight, maxWithdrawWeight, userWeight: '', category };
     };
 
     const [rows, setRows] = useState([
-        createData('Beans', 10, 5, 50, 25),
-        createData('Rice', 5, 2, 20, 10),
-        createData('Ramen', 20, 10, 40, 20),
+        createData('Beans', 10, 5, 50, 25, 'Legumes'),
+        createData('Rice', 5, 2, 20, 10, 'Grains'),
+        createData('Ramen', 20, 10, 40, 20, 'Packaged Food'),
+        createData('Soap', 15, 5, 0, 0, 'Hygiene'),
+        createData('Shampoo', 8, 3, 0, 0, 'Hygiene'),
+        createData('Lentils', 12, 6, 30, 15, 'Legumes'),
+        createData('Pasta', 25, 12, 50, 25, 'Grains'),
+        createData('Oats', 18, 9, 40, 20, 'Grains'),
+        createData('Canned Tuna', 30, 15, 60, 30, 'Packaged Food'),
+        createData('Cereal', 20, 10, 50, 25, 'Packaged Food'),
+        createData('Toothpaste', 10, 5, 0, 0, 'Hygiene'),
+        createData('Toilet Paper', 50, 25, 0, 0, 'Hygiene'),
+        createData('Chicken Breast', 15, 7, 60, 30, 'Meat'),
+        createData('Ground Beef', 10, 5, 50, 25, 'Meat'),
+        createData('Carrots', 20, 10, 40, 20, 'Vegetables'),
+        createData('Potatoes', 30, 15, 60, 30, 'Vegetables'),
+        createData('Apples', 25, 12, 50, 25, 'Fruits'),
+        createData('Bananas', 20, 10, 40, 20, 'Fruits'),
+        createData('Oranges', 15, 7, 30, 15, 'Fruits'),
+        createData('Milk', 10, 5, 40, 20, 'Dairy'),
+        createData('Cheese', 8, 4, 30, 15, 'Dairy'),
+        createData('Yogurt', 12, 6, 25, 12, 'Dairy'),
+        createData('Eggs', 30, 15, 0, 0, 'Dairy'),
+        createData('Peanut Butter', 10, 5, 20, 10, 'Spreads'),
+        createData('Jam', 8, 4, 15, 7, 'Spreads'),
+        createData('Honey', 6, 3, 10, 5, 'Spreads'),
+        createData('Tomatoes', 20, 10, 40, 20, 'Vegetables'),
+        createData('Cucumbers', 15, 7, 30, 15, 'Vegetables'),
+        createData('Broccoli', 12, 6, 25, 12, 'Vegetables'),
+        createData('Chicken Thighs', 10, 5, 50, 25, 'Meat'),
     ]);
 
     const [isWeightMode, setIsWeightMode] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
 
     const handleInputChange = (index, value) => {
         const newRows = [...rows];
@@ -29,7 +58,7 @@ export function Inventory() {
     };
 
     const handleCheckout = () => {
-        const overMax = rows.some(row => 
+        const overMax = rows.some(row =>
             isWeightMode ? row.userWeight > row.maxWithdrawWeight : row.userInput > row.maxWithdraw
         );
         if (overMax) {
@@ -63,6 +92,13 @@ export function Inventory() {
         setIsWeightMode(!isWeightMode);
     };
 
+    const filteredRows = rows.filter(row =>
+        row.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedCategory === '' || row.category === selectedCategory)
+    );
+
+    const uniqueCategories = [...new Set(rows.map(row => row.category))]; // Extract unique categories
+
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
             <AppBar position="static">
@@ -76,6 +112,30 @@ export function Inventory() {
                 </Toolbar>
             </AppBar>
             <Box sx={{ width: '100%', maxWidth: 800, marginTop: 4 }}>
+                <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
+                    <TextField
+                        label="Search"
+                        variant="outlined"
+                        fullWidth
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+                        <InputLabel>Category</InputLabel>
+                        <Select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            label="Category"
+                        >
+                            <MenuItem value="">All</MenuItem>
+                            {uniqueCategories.map((category) => (
+                                <MenuItem key={category} value={category}>
+                                    {category}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -87,7 +147,7 @@ export function Inventory() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map((row, index) => (
+                            {filteredRows.map((row, index) => (
                                 <TableRow key={row.name}>
                                     <TableCell component="th" scope="row">
                                         {row.name}
@@ -142,6 +202,6 @@ export function Inventory() {
             </Box>
         </Container>
     );
-};
+}
 
 export default Inventory;
