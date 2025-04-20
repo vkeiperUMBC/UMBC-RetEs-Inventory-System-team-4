@@ -115,7 +115,7 @@ export function InventoryAdmin() {
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Logged in as: User123
+                        Logged in as: Admin
                     </Typography>
                     <Button color="inherit" onClick={handleLogout}>
                         Logout
@@ -196,7 +196,7 @@ export function InventoryAdmin() {
                                     <TableCell align="center">
                                         <Button
                                             variant="contained"
-                                            color="secondary"
+                                            color="black"
                                             onClick={() => {
                                                 const confirmDelete = window.confirm(`Are you sure you want to remove "${row.name}" from the inventory?`);
                                                 if (confirmDelete) {

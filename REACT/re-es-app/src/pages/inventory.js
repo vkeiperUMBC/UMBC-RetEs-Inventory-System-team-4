@@ -48,12 +48,15 @@ export function Inventory() {
     const [selectedCategory, setSelectedCategory] = useState('');
 
     const handleInputChange = (index, value) => {
+        const rowIndex = rows.findIndex(row => row.name === filteredRows[index].name);
         const newRows = [...rows];
+
         if (isWeightMode) {
-            newRows[index].userWeight = value;
+            newRows[rowIndex].userWeight = value;
         } else {
-            newRows[index].userInput = value;
+            newRows[rowIndex].userInput = value;
         }
+
         setRows(newRows);
     };
 
