@@ -50,6 +50,11 @@ export function Login() {
                     Admin Login
                 </Button>
             </Link>
+            <Link to="/sqltest" style={{ textDecoration: 'none' }}>
+                <Button variant="outlined" color="primary" fullWidth>
+                    TEsting
+                </Button>
+            </Link>
         </Box>
     );
 }
