@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import date
+import pandas as pd  # Ensure pandas is installed for reading Excel files
 
 # checks if able to connect to database
 # if successful, establish cursor object to interact with db
@@ -27,6 +28,57 @@ def createCurrentDatabase(cursor):
             max_amount INTEGER
         )
     ''')
+
+# interprets an excel file and populates the table with the data
+def createExcelDatabase(cursor, excel_file):
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS current_database (
+            item_name TEXT PRIMARY KEY,
+            storage_quantity INTEGER,
+            num_sold INTEGER,
+            serving_weight REAL,
+            serving_amount INTEGER,
+            max_weight REAL,
+            max_amount INTEGER
+        )
+    ''')
+    
+    # Read data from the Excel file and insert it into the database
+    try:
+        data = pd.read_excel(excel_file)
+        for _, row in data.iterrows():
+            cursor.execute('''
+                INSERT OR IGNORE INTO current_database 
+                (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (row['item_name'], row['storage_quantity'], row['num_sold'], row['serving_weight'], 
+                  row['serving_amount'], row['max_weight'], row['max_amount']))
+        print("Data from Excel file has been added to 'current_database'.")
+    except Exception as e:
+        print(f"Failed to process Excel file, make sure it's in the correct format: {e}")
+
+# interprets an excel file and adds the quantities to the current database, adds items that do not exist, and updates other values with the new values
+def updateExcelDatabase(cursor, excel_file):
+    # Read data from the Excel file and insert it into the database
+    try:
+        data = pd.read_excel(excel_file)
+        for _, row in data.iterrows():
+            cursor.execute('''
+                INSERT INTO current_database 
+                (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(item_name) DO UPDATE SET
+                    storage_quantity = storage_quantity + excluded.storage_quantity,
+                    num_sold = num_sold + excluded.num_sold,
+                    serving_weight = excluded.serving_weight,
+                    serving_amount = excluded.serving_amount,
+                    max_weight = excluded.max_weight,
+                    max_amount = excluded.max_amount
+            ''', (row['item_name'], row['storage_quantity'], row['num_sold'], row['serving_weight'], 
+                  row['serving_amount'], row['max_weight'], row['max_amount']))
+        print("Data from Excel file has been updated in 'current_database'.")
+    except Exception as e:
+        print(f"Failed to process Excel file, make sure it's in the correct format: {e}")
 
 # creates a new student purchase database if one does not exist, columns should be student ID, date, day of the week, item name and quantity sold
 def createPurchaseDatabase(cursor):
