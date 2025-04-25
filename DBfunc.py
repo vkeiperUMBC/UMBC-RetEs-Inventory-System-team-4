@@ -21,7 +21,6 @@ def createCurrentDatabase(cursor):
         CREATE TABLE IF NOT EXISTS current_database (
             item_name TEXT PRIMARY KEY,
             storage_quantity INTEGER,
-            num_sold INTEGER,
             serving_weight REAL,
             serving_amount INTEGER,
             max_weight REAL,
@@ -49,9 +48,9 @@ def createExcelDatabase(cursor, excel_file):
         for _, row in data.iterrows():
             cursor.execute('''
                 INSERT OR IGNORE INTO current_database 
-                (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (row['item_name'], row['storage_quantity'], row['num_sold'], row['serving_weight'], 
+                (item_name, storage_quantity, serving_weight, serving_amount, max_weight, max_amount) 
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (row['item_name'], row['storage_quantity'], row['serving_weight'], 
                   row['serving_amount'], row['max_weight'], row['max_amount']))
         print("Data from Excel file has been added to 'current_database'.")
     except Exception as e:
@@ -65,16 +64,15 @@ def updateExcelDatabase(cursor, excel_file):
         for _, row in data.iterrows():
             cursor.execute('''
                 INSERT INTO current_database 
-                (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (item_name, storage_quantity, serving_weight, serving_amount, max_weight, max_amount) 
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(item_name) DO UPDATE SET
                     storage_quantity = storage_quantity + excluded.storage_quantity,
-                    num_sold = num_sold + excluded.num_sold,
                     serving_weight = excluded.serving_weight,
                     serving_amount = excluded.serving_amount,
                     max_weight = excluded.max_weight,
                     max_amount = excluded.max_amount
-            ''', (row['item_name'], row['storage_quantity'], row['num_sold'], row['serving_weight'], 
+            ''', (row['item_name'], row['storage_quantity'], row['serving_weight'], 
                   row['serving_amount'], row['max_weight'], row['max_amount']))
         print("Data from Excel file has been updated in 'current_database'.")
     except Exception as e:
@@ -96,7 +94,7 @@ def createPurchaseDatabase(cursor):
 
 # sets up query parameters to add to table (helper function)
 def setAddQuery():
-    query = "INSERT INTO current_database (item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    query = "INSERT INTO current_database (item_name, storage_quantity, serving_weight, serving_amount, max_weight, max_amount) VALUES (?, ?, ?, ?, ?, ?)"
     return query
 
 # helper function
@@ -164,7 +162,7 @@ def checkLowStock(cursor, threshold):
 # used to decrement quantity of item sold and add the student ID, date, day of the week, item name and quantity sold to the purchase database
 def purchaseItem(conn, cursor, item_name, quantity, student_id):
     check_query = "SELECT * FROM purchase_database WHERE student_id = ? AND item_name = ? AND purchase_date = ?"
-    update_query = "UPDATE current_database SET storage_quantity = storage_quantity - ?, num_sold = num_sold + ? WHERE item_name = ?"
+    update_query = "UPDATE current_database SET storage_quantity = storage_quantity - ?, WHERE item_name = ?"
     insert_query = "INSERT INTO purchase_database (student_id, item_name, purchase_date, day_of_week, purchase_quantity) VALUES (?, ?, ?, ?, ?)"
     
     try:
