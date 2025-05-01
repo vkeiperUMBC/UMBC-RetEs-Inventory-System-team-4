@@ -119,6 +119,7 @@ def add(conn, cursor, valuesList):
     # if so, can add to database
     if values:
         cursor.execute(query, values)
+        print("added")
         conn.commit()
 
 # prints table
@@ -145,7 +146,7 @@ def deleteItem(conn, cursor, item_name):
     
 # used to check for low stock items
 def checkLowStock(cursor, threshold):
-    query = "SELECT item_name, storage_quantity FROM current_database WHERE storage_quantity < ?"
+    query = "SELECT item_name, storage_quantity FROM current_database WHERE storage_quantity <= ?"
     
     try: 
         cursor.execute(query, (threshold,))
