@@ -1,18 +1,23 @@
+#defines frontend and backend protocol interaction
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)  #Enable CORS for all routes
 
-# Store the latest data in memory
+#Store the latest data in memory
 latest_data = {"text": ""}
 
-# Mock user database for demonstration purposes
+#Mock user database for demonstration purposes
 users = {
     "testuser": "password123",  # username: password
     "admin": "adminpass"
 }
 
+@app.before_request
+def innitConn():
+   
+   
 @app.route('/api/data', methods=['POST'])
 def post_data():
     global latest_data
@@ -42,6 +47,34 @@ def login():
     except Exception as e:
         print(f"Error during login: {e}")
         return jsonify({"error": "An error occurred during login"}), 500
+
+@app.route('/inventoryAdmin', methods =['POST'])
+def addItem():
+    try:
+        #request contains HTTP req information
+        #json parses the incoming req, and stores into data
+
+        data = request.json
+        itemName = data.get('name')
+        stock = data.get('stock')
+        maxDraw = data.get('maxWithdraw')
+        maxWeight = data.get('maxWithdrawWeight')
+        category = data.get('category')
+
+        #the add function in database takes in item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount
+        #no option for category
+        #not yet changing until friday to double check what will be impacted
+        toAdd = [itemName, stock, maxDraw, maxWeight, category]
+
+
+        print(f"Adding: {itemName}, Quantity: {stock}, Maximum withdrawal: {maxDraw}, Maximum Weight: {maxWeight}, Category: {category}")
+
+        
+
+    except Exception as e:
+        print(f"Error while adding: {e}")
+        return jsonify({"error": "An error occured while adding an item"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
