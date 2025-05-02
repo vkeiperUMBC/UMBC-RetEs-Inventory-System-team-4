@@ -12,8 +12,7 @@ itemQuantity = 1
 
 stuID = 1234567
 
-itemAdd = ["rock", "10", "1", "1.1", "1", "5", "1"]
-
+itemAdd = ["log", "10", "1", "1.1", "1", "5", "1"]
 #backFunc.purchase(itemPurr, itemQuantity, stuID)
 
 
@@ -21,6 +20,7 @@ itemAdd = ["rock", "10", "1", "1.1", "1", "5", "1"]
 
 backFunc.addItem(itemAdd)
 thing = backFunc.retrieve()
+
 
 
 print(thing)    

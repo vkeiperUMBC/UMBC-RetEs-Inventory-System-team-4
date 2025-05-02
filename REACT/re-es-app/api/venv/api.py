@@ -79,7 +79,8 @@ def addItem():
 @app.route('/api/inventory', methods=['GET'])
 def getInv():
     try: 
-        jInv = [{"name": "rock", "stock": 10, "maxWithdraw": 1, "stockWeight": 1.1, "maxWithdrawWeight": 1}]
+        # jInv = [{"name": "rock", "stock": 10, "maxWithdraw": 1, "stockWeight": 1.1, "maxWithdrawWeight": 1}]
+        jInv = backFunc.retrieve()
         return jsonify(jInv), 200
     except Exception as e:
         print(f"Error while loading inventory: {e}")

@@ -137,6 +137,7 @@ def getTable(cursor):
     print("fhdsi")
     rows = cursor.fetchall()
     print("two")
+    print(rows)
     return rows  
 
 def printStuTable(cursor):
