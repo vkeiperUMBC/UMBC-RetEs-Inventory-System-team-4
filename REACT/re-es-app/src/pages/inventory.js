@@ -1,40 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box, AppBar, Toolbar, Typography, Switch, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box, AppBar, Toolbar, Typography, Switch } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
+
+const fetchData = async (setRows, createData) => {
+    try {
+        const response = await fetch('http://localhost:5000/api/inventory'); // Replace with your API endpoint
+        if (response.ok) {
+            const data = await response.json();
+            const formattedData = data.map(item =>
+                createData(item.name, item.stock, item.maxWithdraw, item.stockWeight, item.maxWithdrawWeight)
+            );
+            setRows(formattedData);
+        } else {
+            console.error('Failed to fetch inventory data');
+        }
+    } catch (error) {
+        console.error('Error fetching inventory data:', error);
+    }
+};
 
 export function Inventory() {
     const navigate = useNavigate();
 
-    const createData = (name, stock, maxWithdraw, stockWeight, maxWithdrawWeight, category) => {
-        return { name, stock, maxWithdraw, userInput: '', stockWeight, maxWithdrawWeight, userWeight: '', category };
+    const createData = (name, stock, maxWithdraw, stockWeight, maxWithdrawWeight) => {
+        return { name, stock, maxWithdraw, userInput: '', stockWeight, maxWithdrawWeight, userWeight: '' };
     };
 
     const [rows, setRows] = useState([]);
     const [isWeightMode, setIsWeightMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
-
-    // Function to fetch data on page access
-    const fetchData = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/api/inventory'); // Replace with your API endpoint
-            if (response.ok) {
-                const data = await response.json();
-                const formattedData = data.map(item =>
-                    createData(item.name, item.stock, item.maxWithdraw, item.stockWeight, item.maxWithdrawWeight, item.category)
-                );
-                setRows(formattedData);
-            } else {
-                console.error('Failed to fetch inventory data');
-            }
-        } catch (error) {
-            console.error('Error fetching inventory data:', error);
-        }
-    };
 
     useEffect(() => {
-        fetchData(); // Run the fetch function when the component is mounted
+        fetchData(setRows, createData); // Pass required arguments
     }, []); // Empty dependency array ensures this runs only once when the component is mounted
 
     const handleInputChange = (index, value) => {
@@ -86,11 +84,8 @@ export function Inventory() {
     };
 
     const filteredRows = rows.filter(row =>
-        row.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (selectedCategory === '' || row.category === selectedCategory)
+        row.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
-    const uniqueCategories = [...new Set(rows.map(row => row.category))]; // Extract unique categories
 
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
@@ -113,21 +108,6 @@ export function Inventory() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                        <InputLabel>Category</InputLabel>
-                        <Select
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            label="Category"
-                        >
-                            <MenuItem value="">All</MenuItem>
-                            {uniqueCategories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                 </Box>
                 <TableContainer component={Paper}>
                     <Table>
