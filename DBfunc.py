@@ -104,7 +104,8 @@ def setAddQuery():
 # if valid returns a tuple to add to database
 def setValues(valuesList):
     verif = len(valuesList)
-    if (verif < 7) or (verif > 7): 
+    if (verif < 7) or (verif > 7):
+        print("is this it?") 
         return None
     else:
         return tuple(valuesList)
@@ -125,6 +126,12 @@ def add(conn, cursor, valuesList):
 # prints table
 def printTable(cursor):
     cursor.execute("SELECT * FROM current_database")
+    rows = cursor.fetchall()
+    for rows in rows:
+        print(rows)
+
+def printStuTable(cursor):
+    cursor.execute("SELECT * FROM purchase_database")
     rows = cursor.fetchall()
     for rows in rows:
         print(rows)
@@ -163,7 +170,7 @@ def checkLowStock(cursor, threshold):
         return False
     
 # used to decrement quantity of item sold and add the student ID, date, day of the week, item name and quantity sold to the purchase database
-def purchaseItem(conn, cursor, item_name, quantity, student_id):
+def purchaseItem(connCurr, cursorCurr, connStu, cursorStu, item_name, quantity, student_id):
     check_query = "SELECT * FROM purchase_database WHERE student_id = ? AND item_name = ? AND purchase_date = ?"
     update_query = "UPDATE current_database SET storage_quantity = storage_quantity - ?, num_sold = num_sold + ? WHERE item_name = ?"
     insert_query = "INSERT INTO purchase_database (student_id, item_name, purchase_date, day_of_week, purchase_quantity) VALUES (?, ?, ?, ?, ?)"
@@ -173,21 +180,23 @@ def purchaseItem(conn, cursor, item_name, quantity, student_id):
         day_of_week = today.strftime("%A")  # Get the day of the week
         
         # Check if the purchase already exists
-        cursor.execute(check_query, (student_id, item_name, today))
-        existing_purchase = cursor.fetchone()
+        cursorStu.execute(check_query, (student_id, item_name, today))
+        existing_purchase = cursorStu.fetchone()
         
         if existing_purchase:
             print(f"Duplicate purchase detected: {student_id} already purchased {item_name} today.")
             return
         
         # Proceed with the purchase
-        cursor.execute(update_query, (quantity, quantity, item_name))
-        cursor.execute(insert_query, (student_id, item_name, today, day_of_week, quantity))
-        conn.commit()
+        cursorCurr.execute(update_query, (quantity, quantity, item_name))
+        cursorStu.execute(insert_query, (student_id, item_name, today, day_of_week, quantity))
+        connCurr.commit()
+        connStu.commit()
         print(f"Purchased {quantity} of {item_name}.")
     except sqlite3.Error as e:
         print("Failed to purchase item")
-        conn.rollback()
+        connStu.rollback()
+        connCurr.rollback()
 
 # Track popular items by checking student purchase history database and sort based on parameter (week, month, all-time) (backend)
 def trackPopularItems(cursor, time_period):
@@ -260,3 +269,15 @@ def trackDailyVisits(cursor):
             print(f"Day: {day_name}, Total Purchases: {visit[1]}")
     else:
         print("No purchases found in the last 90 days.")
+
+
+#used to check if item exists within current_database (stock database)
+def searchItem(conn, cursor, item_name):
+    query = "SELECT * FROM current_database WHERE LOWER(item_name) LIKE LOWER(?)"
+    cursor.execute(query, (item_name.lower(),))
+    check = cursor.fetchall()
+
+    if check:
+        return True
+    else:
+        return False
