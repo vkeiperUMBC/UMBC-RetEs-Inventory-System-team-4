@@ -89,6 +89,11 @@ export function Login() {
                     Admin Login
                 </Button>
             </Link>
+            <Link to="/inventory" style={{ textDecoration: 'none' }}>
+                <Button variant="outlined" color="primary" fullWidth>
+                    Stud Login
+                </Button>
+            </Link>
             <Link to="/sqltest" style={{ textDecoration: 'none' }}>
                 <Button variant="outlined" color="primary" fullWidth>
                     Testing

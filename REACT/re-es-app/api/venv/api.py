@@ -1,6 +1,7 @@
 #defines frontend and backend protocol interaction
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import backFunc
 
 app = Flask(__name__)
 CORS(app)  #Enable CORS for all routes
@@ -14,8 +15,8 @@ users = {
     "admin": "adminpass"
 }
 
-@app.before_request
-def innitConn():
+# @app.before_request
+# def innitConn():
    
    
 @app.route('/api/data', methods=['POST'])
@@ -74,6 +75,16 @@ def addItem():
     except Exception as e:
         print(f"Error while adding: {e}")
         return jsonify({"error": "An error occured while adding an item"}), 500
+
+@app.route('/api/inventory', methods=['GET'])
+def getInv():
+    try: 
+        # jInv = [{"name": "rock", "stock": 10, "maxWithdraw": 1, "stockWeight": 1.1, "maxWithdrawWeight": 1}]
+        jInv = backFunc.retrieve()
+        return jsonify(jInv), 200
+    except Exception as e:
+        print(f"Error while loading inventory: {e}")
+        return jsonify({"error": "An error occurred while loading inventory"}), 500
 
 
 if __name__ == '__main__':

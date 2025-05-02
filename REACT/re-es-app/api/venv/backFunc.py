@@ -1,11 +1,12 @@
 import DBfunc
 import string
 import sqlite3
+from flask import jsonify
 
 #connects to database of stock items: CurrStock
 def connectCurrStock():
     # setting up database file
-    currStock = "currStock.db" #current stock database
+    currStock = "c:/Users/keipe/Documents/447 project/UMBC-RetEs-Inventory-System-team-4/REACT/re-es-app/api/venv/currStock.db" #current stock database
     
     # establishing conn as none
     connCurr = None
@@ -104,6 +105,32 @@ def purchase(item_name, quantity, student_id):
     connCurr.close()
     connStu.close()
     
+def retrieve():
+    conCurr = connectCurrStock()
+    cursorCurr = conCurr.cursor()
+    
+    # Fetch raw data from the database
+    raw_data = DBfunc.getTable(cursorCurr)
+    print(f"Raw data: {raw_data}")  # Debugging output
+
+    formatted_data = []
+    # Convert raw data (e.g., tuples) into a list of dictionaries
+    for row in raw_data:
+        formatted_data.append({
+            "name": row[0],
+            "stock": row[1],
+            "maxWithdraw": row[2],
+            "stockWeight": row[3],
+            "maxWithdrawWeight": row[4]
+        })
+        
+    print(f"Formatted data: {formatted_data}")  # Debugging output
+    
+    conCurr.close()
+    return formatted_data
+
+
+
 
 
 

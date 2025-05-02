@@ -1,7 +1,34 @@
 import sqlite3
 import DBfunc
+import backFunc
 
-if __name__ == "__main__":
+# if __name__ == "main":
+
+#item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount
+
+itemPurr = 'stik'
+
+itemQuantity = 1
+
+stuID = 1234567
+
+itemAdd = ["things", "10", "1", "1.1", "1", "5", "1"]
+#backFunc.purchase(itemPurr, itemQuantity, stuID)
+
+
+#backFunc.removeItem('coke')
+
+backFunc.addItem(itemAdd)
+thing = backFunc.retrieve()
+
+
+
+print(thing)    
+
+
+
+
+"""
     #setting up database file
     currStock = "currStock.db" #current stock database
     stuPurchase = "stuPurchase.db" #purchase database tracking dupe db + analytic 
@@ -27,6 +54,7 @@ if __name__ == "__main__":
         cursor = conn1.cursor()
         DBfunc.createPurchaseDatabase(cursor)
         DBfunc.purchaseItem(conn1, cursor, "beans", 2, "000000")
-        DB
+
 
         DBfunc.printTable(cursor)
+"""

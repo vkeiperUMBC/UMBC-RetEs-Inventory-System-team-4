@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
 import {
     Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box,
-    AppBar, Toolbar, Typography, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, MenuItem
+    AppBar, Toolbar, Typography, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 export function InventoryAdmin() {
     const navigate = useNavigate();
 
-    const createData = (name, stock, maxWithdraw, stockWeight, maxWithdrawWeight, category) => {
-        return { name, stock, maxWithdraw, stockWeight, maxWithdrawWeight, category };
+    const createData = (name, stock, maxWithdraw, stockWeight, maxWithdrawWeight) => {
+        return { name, stock, maxWithdraw, stockWeight, maxWithdrawWeight };
     };
 
     const [rows, setRows] = useState([
-        createData('Beans', 10, 5, 50, 25, 'Legumes'),
-        createData('Rice', 5, 2, 20, 10, 'Grains'),
-        createData('Ramen', 20, 10, 40, 20, 'Packaged Food'),
-        createData('Soap', 15, 5, 0, 0, 'Hygiene'),
-        createData('Shampoo', 8, 3, 0, 0, 'Hygiene'),
-        createData('Lentils', 12, 6, 30, 15, 'Legumes'),
-        createData('Pasta', 25, 12, 50, 25, 'Grains'),
-        createData('Oats', 18, 9, 40, 20, 'Grains'),
-        createData('Canned Tuna', 30, 15, 60, 30, 'Packaged Food'),
-        createData('Cereal', 20, 10, 50, 25, 'Packaged Food'),
+        createData('Beans', 10, 5, 50, 25),
+        createData('Rice', 5, 2, 20, 10),
+        createData('Ramen', 20, 10, 40, 20),
+        createData('Soap', 15, 5, 0, 0),
+        createData('Shampoo', 8, 3, 0, 0),
+        createData('Lentils', 12, 6, 30, 15),
+        createData('Pasta', 25, 12, 50, 25),
+        createData('Oats', 18, 9, 40, 20),
+        createData('Canned Tuna', 30, 15, 60, 30),
+        createData('Cereal', 20, 10, 50, 25),
     ]);
 
     const [initialRows, setInitialRows] = useState([...rows]); // Baseline state for comparison
     const [modifiedFields, setModifiedFields] = useState({}); // Tracks modified fields
     const [newlyAddedRows, setNewlyAddedRows] = useState([]); // Tracks newly added rows
 
-    const [filters, setFilters] = useState({ searchQuery: '', selectedCategory: '' });
+    const [filters, setFilters] = useState({ searchQuery: '' });
 
     const [openDialog, setOpenDialog] = useState(false);
 
@@ -39,7 +39,6 @@ export function InventoryAdmin() {
         maxWithdraw: '',
         stockWeight: '',
         maxWithdrawWeight: '',
-        category: '',
     });
 
     const handleInputChange = (index, field, value) => {
@@ -81,11 +80,10 @@ export function InventoryAdmin() {
             parseInt(newItem.stock, 10),
             parseInt(newItem.maxWithdraw, 10),
             parseFloat(newItem.stockWeight),
-            parseFloat(newItem.maxWithdrawWeight),
-            newItem.category
+            parseFloat(newItem.maxWithdrawWeight)
         )]);
         setNewlyAddedRows([...newlyAddedRows, rows.length]); // Add the index of the new row
-        setNewItem({ name: '', stock: '', maxWithdraw: '', stockWeight: '', maxWithdrawWeight: '', category: '' });
+        setNewItem({ name: '', stock: '', maxWithdraw: '', stockWeight: '', maxWithdrawWeight: '' });
         setOpenDialog(false);
     };
 
@@ -104,11 +102,8 @@ export function InventoryAdmin() {
     };
 
     const filteredRows = rows.filter(row =>
-        row.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) &&
-        (filters.selectedCategory === '' || row.category === filters.selectedCategory)
+        row.name.toLowerCase().includes(filters.searchQuery.toLowerCase())
     );
-
-    const uniqueCategories = [...new Set(rows.map(row => row.category))];
 
     return (
         <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh' }}>
@@ -131,21 +126,6 @@ export function InventoryAdmin() {
                         value={filters.searchQuery}
                         onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
                     />
-                    <FormControl variant="outlined" sx={{ minWidth: 150 }}>
-                        <InputLabel>Category</InputLabel>
-                        <Select
-                            value={filters.selectedCategory}
-                            onChange={(e) => setFilters({ ...filters, selectedCategory: e.target.value })}
-                            label="Category"
-                        >
-                            <MenuItem value="">All</MenuItem>
-                            {uniqueCategories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                 </Box>
                 <TableContainer component={Paper}>
                     <Table>
@@ -156,7 +136,6 @@ export function InventoryAdmin() {
                                 <TableCell align="right">Max Request (Quantity)</TableCell>
                                 <TableCell align="right">Stock (Weight)</TableCell>
                                 <TableCell align="right">Max Request (Weight)</TableCell>
-                                <TableCell align="right">Category</TableCell>
                                 <TableCell align="center">Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -192,7 +171,6 @@ export function InventoryAdmin() {
                                             onChange={(e) => handleInputChange(index, 'maxWithdrawWeight', e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell>{row.category}</TableCell>
                                     <TableCell align="center">
                                         <Button
                                             variant="contained"
@@ -284,13 +262,6 @@ export function InventoryAdmin() {
                         margin="dense"
                         value={newItem.maxWithdrawWeight}
                         onChange={(e) => setNewItem({ ...newItem, maxWithdrawWeight: e.target.value })}
-                    />
-                    <TextField
-                        label="Category"
-                        fullWidth
-                        margin="dense"
-                        value={newItem.category}
-                        onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
                     />
                 </DialogContent>
                 <DialogActions>
