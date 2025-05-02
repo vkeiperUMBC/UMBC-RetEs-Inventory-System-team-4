@@ -12,7 +12,7 @@ itemQuantity = 1
 
 stuID = 1234567
 
-itemAdd = ["log", "10", "1", "1.1", "1", "5", "1"]
+itemAdd = ["things", "10", "1", "1.1", "1", "5", "1"]
 #backFunc.purchase(itemPurr, itemQuantity, stuID)
 
 
