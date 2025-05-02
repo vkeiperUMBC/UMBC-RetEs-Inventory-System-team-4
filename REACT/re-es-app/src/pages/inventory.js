@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box, AppBar, Toolbar, Typography, Switch, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
@@ -10,42 +10,32 @@ export function Inventory() {
         return { name, stock, maxWithdraw, userInput: '', stockWeight, maxWithdrawWeight, userWeight: '', category };
     };
 
-    const [rows, setRows] = useState([
-        createData('Beans', 10, 5, 50, 25, 'Legumes'),
-        createData('Rice', 5, 2, 20, 10, 'Grains'),
-        createData('Ramen', 20, 10, 40, 20, 'Packaged Food'),
-        createData('Soap', 15, 5, 0, 0, 'Hygiene'),
-        createData('Shampoo', 8, 3, 0, 0, 'Hygiene'),
-        createData('Lentils', 12, 6, 30, 15, 'Legumes'),
-        createData('Pasta', 25, 12, 50, 25, 'Grains'),
-        createData('Oats', 18, 9, 40, 20, 'Grains'),
-        createData('Canned Tuna', 30, 15, 60, 30, 'Packaged Food'),
-        createData('Cereal', 20, 10, 50, 25, 'Packaged Food'),
-        createData('Toothpaste', 10, 5, 0, 0, 'Hygiene'),
-        createData('Toilet Paper', 50, 25, 0, 0, 'Hygiene'),
-        createData('Chicken Breast', 15, 7, 60, 30, 'Meat'),
-        createData('Ground Beef', 10, 5, 50, 25, 'Meat'),
-        createData('Carrots', 20, 10, 40, 20, 'Vegetables'),
-        createData('Potatoes', 30, 15, 60, 30, 'Vegetables'),
-        createData('Apples', 25, 12, 50, 25, 'Fruits'),
-        createData('Bananas', 20, 10, 40, 20, 'Fruits'),
-        createData('Oranges', 15, 7, 30, 15, 'Fruits'),
-        createData('Milk', 10, 5, 40, 20, 'Dairy'),
-        createData('Cheese', 8, 4, 30, 15, 'Dairy'),
-        createData('Yogurt', 12, 6, 25, 12, 'Dairy'),
-        createData('Eggs', 30, 15, 0, 0, 'Dairy'),
-        createData('Peanut Butter', 10, 5, 20, 10, 'Spreads'),
-        createData('Jam', 8, 4, 15, 7, 'Spreads'),
-        createData('Honey', 6, 3, 10, 5, 'Spreads'),
-        createData('Tomatoes', 20, 10, 40, 20, 'Vegetables'),
-        createData('Cucumbers', 15, 7, 30, 15, 'Vegetables'),
-        createData('Broccoli', 12, 6, 25, 12, 'Vegetables'),
-        createData('Chicken Thighs', 10, 5, 50, 25, 'Meat'),
-    ]);
-
+    const [rows, setRows] = useState([]);
     const [isWeightMode, setIsWeightMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+
+    // Function to fetch data on page access
+    const fetchData = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/inventory'); // Replace with your API endpoint
+            if (response.ok) {
+                const data = await response.json();
+                const formattedData = data.map(item =>
+                    createData(item.name, item.stock, item.maxWithdraw, item.stockWeight, item.maxWithdrawWeight, item.category)
+                );
+                setRows(formattedData);
+            } else {
+                console.error('Failed to fetch inventory data');
+            }
+        } catch (error) {
+            console.error('Error fetching inventory data:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData(); // Run the fetch function when the component is mounted
+    }, []); // Empty dependency array ensures this runs only once when the component is mounted
 
     const handleInputChange = (index, value) => {
         const rowIndex = rows.findIndex(row => row.name === filteredRows[index].name);
