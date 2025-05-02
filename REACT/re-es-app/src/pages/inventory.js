@@ -5,7 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 const fetchData = async (setRows, createData) => {
     try {
-        const response = await fetch('http://localhost:5000/api/inventory'); // Replace with your API endpoint
+        const response = await fetch('http://localhost:5000/api/inventory', {
+            method: 'GET',
+            headers: {
+                'Initial-Load': 'true', // Custom header for initial load
+            },
+        });
+
         if (response.ok) {
             const data = await response.json();
             const formattedData = data.map(item =>
@@ -32,7 +38,7 @@ export function Inventory() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        fetchData(setRows, createData); // Pass required arguments
+        fetchData(setRows, createData); // Fetch data on initial load
     }, []); // Empty dependency array ensures this runs only once when the component is mounted
 
     const handleInputChange = (index, value) => {
