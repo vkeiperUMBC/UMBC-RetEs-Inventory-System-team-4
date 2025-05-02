@@ -30,6 +30,7 @@ def createCurrentDatabase(cursor):
     ''')
 
 # interprets an excel file and populates the table with the data
+#overwrites preexisting file
 def createExcelDatabase(cursor, excel_file):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS current_database (
@@ -58,6 +59,7 @@ def createExcelDatabase(cursor, excel_file):
         print(f"Failed to process Excel file, make sure it's in the correct format: {e}")
 
 # interprets an excel file and adds the quantities to the current database, adds items that do not exist, and updates other values with the new values
+#does not override
 def updateExcelDatabase(cursor, excel_file):
     # Read data from the Excel file and insert it into the database
     try:

@@ -16,7 +16,7 @@ users = {
 
 @app.before_request
 def innitConn():
-    print(f"PEEPEEPOOPOO")
+
 
 @app.route('/api/data', methods=['POST'])
 def post_data():
