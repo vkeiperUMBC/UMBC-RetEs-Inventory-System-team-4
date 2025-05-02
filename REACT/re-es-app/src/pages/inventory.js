@@ -6,10 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const fetchData = async (setRows, createData) => {
     try {
         const response = await fetch('http://localhost:5000/api/inventory', {
-            method: 'GET',
-            headers: {
-                'Initial-Load': 'true', // Custom header for initial load
-            },
+            method: 'GET'
         });
 
         if (response.ok) {
