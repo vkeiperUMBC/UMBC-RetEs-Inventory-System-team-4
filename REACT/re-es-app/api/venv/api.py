@@ -16,8 +16,8 @@ users = {
 
 @app.before_request
 def innitConn():
-
-
+   
+   
 @app.route('/api/data', methods=['POST'])
 def post_data():
     global latest_data
