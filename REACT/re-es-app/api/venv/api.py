@@ -69,7 +69,7 @@ def addItem():
 
         print(f"Adding: {itemName}, Quantity: {stock}, Maximum withdrawal: {maxDraw}, Maximum Weight: {maxWeight}, Category: {category}")
 
-        backFunc.
+        
 
     except Exception as e:
         print(f"Error while adding: {e}")
