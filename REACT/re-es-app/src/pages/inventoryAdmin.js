@@ -90,7 +90,8 @@ export function InventoryAdmin() {
             name: newItem.name,
             stock: parseInt(newItem.stock, 10),
             maxWithdraw: parseInt(newItem.maxWithdraw, 10),
-            stockWeight: parseFloat(newItem.stockWeight),
+            servingWeight: parseFloat(newItem.servingWeight),
+            servingAmount: parseInt(newItem.servingAmount, 10),
             maxWithdrawWeight: parseFloat(newItem.maxWithdrawWeight),
         };
 
@@ -117,7 +118,7 @@ export function InventoryAdmin() {
         }
 
         // Reset the dialog and new item state
-        setNewItem({ name: '', stock: '', maxWithdraw: '', stockWeight: '', maxWithdrawWeight: '' });
+        setNewItem({ name: '', stock: '', maxWithdraw: '', servingWeight: '', servingAmount: '', maxWithdrawWeight: '' });
         setOpenDialog(false);
     };
 
@@ -248,12 +249,8 @@ export function InventoryAdmin() {
                                             onChange={(e) => handleInputChange(index, 'maxWithdraw', e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell align="right" style={getCellStyle(index, 'stockWeight')}>
-                                        <TextField
-                                            type="number"
-                                            value={row.stockWeight}
-                                            onChange={(e) => handleInputChange(index, 'stockWeight', e.target.value)}
-                                        />
+                                    <TableCell align="right">
+                                        {row.stockWeight} {/* Display-only field */}
                                     </TableCell>
                                     <TableCell align="right" style={getCellStyle(index, 'maxWithdrawWeight')}>
                                         <TextField
@@ -344,15 +341,23 @@ export function InventoryAdmin() {
                         onChange={(e) => setNewItem({ ...newItem, maxWithdraw: e.target.value })}
                     />
                     <TextField
-                        label="Stock Weight (lbs)"
+                        label="Weight per Serving"
                         type="number"
                         fullWidth
                         margin="dense"
-                        value={newItem.stockWeight}
-                        onChange={(e) => setNewItem({ ...newItem, stockWeight: e.target.value })}
+                        value={newItem.servingWeight}
+                        onChange={(e) => setNewItem({ ...newItem, servingWeight: e.target.value })}
                     />
                     <TextField
-                        label="Max Withdraw Weight (lbs)"
+                        label="Serving Per Stock"
+                        type="number"
+                        fullWidth
+                        margin="dense"
+                        value={newItem.servingAmount}
+                        onChange={(e) => setNewItem({ ...newItem, servingAmount: e.target.value })}
+                    />
+                    <TextField
+                        label="Max Withdraw Weight"
                         type="number"
                         fullWidth
                         margin="dense"

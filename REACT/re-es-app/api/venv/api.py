@@ -141,11 +141,12 @@ def add_item():
         item_name = data.get('name')
         stock = int(data.get('stock', 0))
         max_withdraw = int(data.get('maxWithdraw', 0))
-        stock_weight = float(data.get('stockWeight', 0))
-        max_withdraw_weight = float(data.get('maxWithdrawWeight', 0))
+        serving_weight = float(data.get('servingWeight', 0))
+        serving_per_stock = int(data.get('servingAmount', 0))  # Fixed key
+        max_withdraw_weight = float(data.get('maxWithdrawWeight', 0))  # Fixed key
 
         # Prepare the item data for the database
-        to_add = [item_name, stock, 0, stock_weight, 0, max_withdraw_weight, max_withdraw]
+        to_add = [item_name, stock, 0, serving_weight, serving_per_stock, max_withdraw, max_withdraw_weight]
 
         # Call the backFunc.addItem function to add the item to the database
         backFunc.addItem(to_add)
