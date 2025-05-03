@@ -21,7 +21,7 @@ def connectCurrStock():
     
 #connects to database of student purchases: stuPurchase
 def connectStuPurchase():
-    stuPurchase = "stuPurchase.db" # purchase database tracking dupe db + analytic 
+    stuPurchase = "c:/Users/keipe/Documents/447 project/UMBC-RetEs-Inventory-System-team-4/REACT/re-es-app/api/venv/stuPurchase.db" # purchase database tracking dupe db + analytic 
 
     connStu = None
     connStu = DBfunc.test_connection(connStu, stuPurchase)

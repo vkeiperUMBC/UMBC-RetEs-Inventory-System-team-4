@@ -14,8 +14,13 @@ const fetchData = async (setRows, createData) => {
         if (response.ok) {
             const data = await response.json();
             const formattedData = data.map(item =>
-                // name, stock, num_sold, serving_weight, serving_amount, max weight, max amount
-                createData(item.name, item.stock, item.maxWithdraw, item.stockWeight, item.maxWithdrawWeight)
+                createData(
+                    item.name || '', // Default to empty string if name is missing
+                    item.stock || 0, // Default to 0 if stock is missing
+                    item.maxWithdraw || 0, // Default to 0 if maxWithdraw is missing
+                    item.stockWeight || 0, // Default to 0 if stockWeight is missing
+                    item.maxWithdrawWeight || 0 // Default to 0 if maxWithdrawWeight is missing
+                )
             );
             setRows(formattedData);
         } else {
@@ -56,13 +61,22 @@ export function InventoryAdmin() {
         const newRows = [...rows];
         const newValue = parseFloat(value) || 0;
 
+        // Ensure the row exists
+        if (!newRows[index]) {
+            newRows[index] = {};
+        }
+
         // Update the specific field
         newRows[index][field] = newValue;
 
         // Track the modified field based on comparison with initialRows
         setModifiedFields((prev) => ({
             ...prev,
-            [`${index}-${field}`]: newValue > initialRows[index][field] ? 'increased' : newValue < initialRows[index][field] ? 'decreased' : 'unchanged',
+            [`${index}-${field}`]: newValue > (initialRows[index]?.[field] || 0)
+                ? 'increased'
+                : newValue < (initialRows[index]?.[field] || 0)
+                ? 'decreased'
+                : 'unchanged',
         }));
 
         setRows(newRows);
