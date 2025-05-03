@@ -23,6 +23,26 @@ const fetchData = async (setRows, createData) => {
     }
 };
 
+const sendCheckoutData = async (checkoutItems) => {
+    try {
+        const response = await fetch('http://localhost:5000/api/checkout', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(checkoutItems), // Send the checkout data as JSON
+        });
+
+        if (response.ok) {
+            console.log('Checkout data sent successfully');
+        } else {
+            console.error('Failed to send checkout data');
+        }
+    } catch (error) {
+        console.error('Error sending checkout data:', error);
+    }
+};
+
 export function Inventory() {
     const navigate = useNavigate();
 
@@ -58,22 +78,25 @@ export function Inventory() {
         if (overMax) {
             alert('One or more quantities entered exceed the maximum allowed.');
         } else {
-            const orderSummary = rows
+            const checkoutItems = rows
                 .filter(row => (isWeightMode ? row.userWeight > 0 : row.userInput > 0))
-                .map(row => `${row.name}: ${isWeightMode ? `${row.userWeight} lbs` : `${row.userInput}`}`)
+                .map(row => ({
+                    name: row.name,
+                    stock: isWeightMode ? row.userWeight : row.userInput,
+                }));
+
+            const orderSummary = checkoutItems
+                .map(item => `${item.name}: ${item.stock}`)
                 .join('\n');
 
             const confirmOrder = window.confirm(`You are ordering:\n${orderSummary}\n\nDo you want to proceed?`);
             if (confirmOrder) {
-                const newRows = rows.map(row => ({
-                    ...row,
-                    stock: isWeightMode ? row.stock : row.stock - row.userInput,
-                    stockWeight: isWeightMode ? row.stockWeight - row.userWeight : row.stockWeight,
-                    userInput: '',
-                    userWeight: ''
-                }));
-                setRows(newRows);
-                alert('Checkout successful!');
+                // Send checkout data to the backend
+                sendCheckoutData(checkoutItems).then(() => {
+                    alert('Checkout successful!');
+                    // Refresh the inventory after a successful checkout
+                    fetchData(setRows, createData);
+                });
             }
         }
     };

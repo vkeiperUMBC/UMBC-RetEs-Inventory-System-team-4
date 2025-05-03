@@ -29,6 +29,30 @@ def connectStuPurchase():
         cursor = connStu.cursor()
         DBfunc.createPurchaseDatabase(cursor)
         return connStu
+    
+def overrideExcel():
+    excel = "c:/Users/keipe/Documents/447 project/UMBC-RetEs-Inventory-System-team-4/REACT/re-es-app/api/venv/uploads/excel.xlsx"
+    #print("jsiudf")
+    connExcel = None
+    connExcel = connectCurrStock()
+    
+    if connExcel:
+        cursor = connExcel.cursor()
+        DBfunc.createExcelDatabase(cursor, excel)
+
+    print("are we out of the database")
+    connExcel.close()
+
+def combineExcel():
+    excel = "c:/Users/keipe/Documents/447 project/UMBC-RetEs-Inventory-System-team-4/REACT/re-es-app/api/venv/uploads/excel.xlsx/"
+    connExcel = None
+    connExcel = connectCurrStock()
+    
+    if connExcel:
+        cursor = connExcel.cursor()
+        DBfunc.updateExcelDatabase(cursor, excel)
+    
+    
 
 """
 #connnection for 
@@ -98,7 +122,7 @@ def purchase(item_name, quantity, student_id):
     #checks if stu can purchase, if so add to database of student purchases
     DBfunc.purchaseItem(connCurr, cursorCurr, connStu, cursorStu, item_name, quantity, student_id)
 
-    removeItem(item_name)
+    # removeItem(item_name)
     DBfunc.printTable(cursorCurr)
     DBfunc.printStuTable(cursorStu)
 
@@ -116,22 +140,16 @@ def retrieve():
     formatted_data = []
     # Convert raw data (e.g., tuples) into a list of dictionaries
     for row in raw_data:
+        stock_weight = row[1]*row[4]*row[3]
         formatted_data.append({
             "name": row[0],
             "stock": row[1],
-            "maxWithdraw": row[2],
-            "stockWeight": row[3],
-            "maxWithdrawWeight": row[4]
+            "maxWithdraw": row[5],
+            "stockWeight": stock_weight,
+            "maxWithdrawWeight": row[6]
         })
         
     print(f"Formatted data: {formatted_data}")  # Debugging output
     
     conCurr.close()
     return formatted_data
-
-
-
-
-
-
-

@@ -2,59 +2,34 @@ import sqlite3
 import DBfunc
 import backFunc
 
-# if __name__ == "main":
+# Define 20 grocery items to add to the database
+grocery_items = [
+    ["Apples", "50", "5", "0.2", "1", "10", "2"],
+    ["Bananas", "100", "10", "0.3", "2", "20", "4"],
+    ["Carrots", "200", "15", "0.1", "1", "15", "3"],
+    ["Tomatoes", "150", "12", "0.25", "1.5", "12", "3"],
+    ["Potatoes", "300", "20", "0.5", "2.5", "25", "5"],
+    ["Onions", "250", "18", "0.4", "2", "18", "4"],
+    ["Milk", "100", "10", "1", "5", "10", "2"],
+    ["Eggs", "200", "20", "0.05", "1", "20", "4"],
+    ["Cheese", "50", "5", "0.5", "2", "5", "1"],
+    ["Bread", "150", "15", "0.3", "1.5", "15", "3"],
+    ["Rice", "500", "50", "1", "10", "50", "10"],
+    ["Beans", "400", "40", "0.8", "8", "40", "8"],
+    ["Chicken", "100", "10", "1.5", "5", "10", "2"],
+    ["Beef", "80", "8", "2", "6", "8", "2"],
+    ["Fish", "60", "6", "1.2", "4", "6", "1"],
+    ["Pasta", "300", "30", "0.4", "2", "30", "6"],
+    ["Cereal", "200", "20", "0.5", "2.5", "20", "4"],
+    ["Juice", "150", "15", "1", "5", "15", "3"],
+    ["Soda", "250", "25", "0.5", "2", "25", "5"],
+    ["Water", "500", "50", "1", "10", "50", "10"],
+]
 
-#item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount
+# Add each grocery item to the database
+for item in grocery_items:
+    backFunc.addItem(item)
 
-itemPurr = 'stik'
-
-itemQuantity = 1
-
-stuID = 1234567
-
-itemAdd = ["things", "10", "1", "1.1", "1", "5", "1"]
-#backFunc.purchase(itemPurr, itemQuantity, stuID)
-
-
-#backFunc.removeItem('coke')
-
-backFunc.addItem(itemAdd)
-thing = backFunc.retrieve()
-
-
-
-print(thing)    
-
-
-
-
-"""
-    #setting up database file
-    currStock = "currStock.db" #current stock database
-    stuPurchase = "stuPurchase.db" #purchase database tracking dupe db + analytic 
-    #establishing conn as none
-    conn = None
-    conn1 = None
-
-    conn = DBfunc.test_connection(conn, currStock)
-    #conn1 = DBfunc.test_connection(conn1, stuPurchase)
-
-
-    #able to succcessfully connect
-    if conn:
-        cursor = conn.cursor()
-        DBfunc.createCurrentDatabase(cursor)
-        #query = ["rock", "10", "1", "1.1", "1", "5", "1"]
-        #DBfunc.add(conn, cursor, query)
-        DBfunc.printTable(cursor)
-        DBfunc.checkLowStock(cursor, 10)
-
-
-    if conn1:
-        cursor = conn1.cursor()
-        DBfunc.createPurchaseDatabase(cursor)
-        DBfunc.purchaseItem(conn1, cursor, "beans", 2, "000000")
-
-
-        DBfunc.printTable(cursor)
-"""
+# Retrieve and print the updated inventory
+updated_inventory = backFunc.retrieve()
+print(updated_inventory)
