@@ -174,6 +174,34 @@ def remove_item():
     except Exception as e:
         print(f"Error while removing item: {e}")
         return jsonify({"error": "An error occurred while removing the item"}), 500
+
+@app.route('/api/purchases', methods=['GET'])
+def get_purchases():
+    try:
+        connStu = backFunc.connectStuPurchase()
+        cursorStu = connStu.cursor()
+
+        # Fetch all purchase records
+        cursorStu.execute("SELECT * FROM purchase_database")
+        purchases = cursorStu.fetchall()
+
+        # Format the data as a list of dictionaries
+        formatted_purchases = [
+            {
+                "student_id": row[0],
+                "item_name": row[1],
+                "purchase_date": row[2],
+                "day_of_week": row[3],
+                "purchase_quantity": row[4]
+            }
+            for row in purchases
+        ]
+
+        connStu.close()
+        return jsonify(formatted_purchases), 200
+    except Exception as e:
+        print(f"Error while fetching purchases: {e}")
+        return jsonify({"error": "An error occurred while fetching purchases"}), 500
     
 if __name__ == '__main__':
     app.run(debug=True)

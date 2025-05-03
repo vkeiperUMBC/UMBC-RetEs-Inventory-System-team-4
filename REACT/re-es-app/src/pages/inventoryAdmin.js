@@ -221,6 +221,9 @@ export function InventoryAdmin() {
                     <Button color="inherit" onClick={handleLogout}>
                         Logout
                     </Button>
+                    <Button color="inherit" onClick={() => navigate('/analytics')}>
+                        Analytics
+                    </Button>
                 </Toolbar>
             </AppBar>
             <Box sx={{ width: '100%', maxWidth: 800, marginTop: 4 }}>

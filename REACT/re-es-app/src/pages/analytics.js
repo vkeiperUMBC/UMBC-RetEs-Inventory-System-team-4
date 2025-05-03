@@ -5,8 +5,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 const Analytics = () => {
-    const [purchases, setPurchases] = useState([]);
-    const [studentData, setStudentData] = useState([]);
+    const [purchases, setPurchases] = useState([]); // Stores all purchase data
+    const [studentData, setStudentData] = useState([]); // Stores aggregated data for the bar chart
     const navigate = useNavigate();
 
     useEffect(() => {
