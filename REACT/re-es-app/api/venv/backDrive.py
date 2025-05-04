@@ -1,60 +1,30 @@
-import sqlite3
-import DBfunc
 import backFunc
+import random
 
-# if __name__ == "main":
+# Define a list of items available for purchase
+items = [
+    "Apples", "Bananas", "Carrots", "Tomatoes", "Potatoes", "Onions", "Milk", "Eggs",
+    "Cheese", "Bread", "Rice", "Beans", "Chicken", "Beef", "Fish", "Pasta",
+    "Cereal", "Juice", "Soda", "Water"
+]
 
-#item_name, storage_quantity, num_sold, serving_weight, serving_amount, max_weight, max_amount
+# Define 8 students
+students = ["student1", "student2", "student3", "student4", "student5", "student6", "student7", "student8"]
 
-itemPurr = 'stik'
+# Generate a randomized list of purchases
+purchases = []
+for _ in range(40):  # Generate 40 purchases
+    item_name = random.choice(items)  # Randomly select an item
+    quantity = random.randint(1, 5)  # Randomly select a quantity between 1 and 5
+    student_id = random.choice(students)  # Randomly assign a student
+    purchases.append({"item_name": item_name, "quantity": quantity, "student_id": student_id})
 
-itemQuantity = 1
+# Shuffle the purchases to randomize the order
+random.shuffle(purchases)
 
-stuID = 1234567
+# Add each purchase to the stuPurchase database
+for purchase in purchases:
+    backFunc.purchase(purchase["item_name"], purchase["quantity"], purchase["student_id"])
 
-itemAdd = ["things", "10", "1", "1.1", "1", "5", "1"]
-#backFunc.purchase(itemPurr, itemQuantity, stuID)
-
-
-#backFunc.removeItem('coke')
-
-backFunc.addItem(itemAdd)
-thing = backFunc.retrieve()
-
-
-
-print(thing)    
-
-
-
-
-"""
-    #setting up database file
-    currStock = "currStock.db" #current stock database
-    stuPurchase = "stuPurchase.db" #purchase database tracking dupe db + analytic 
-    #establishing conn as none
-    conn = None
-    conn1 = None
-
-    conn = DBfunc.test_connection(conn, currStock)
-    #conn1 = DBfunc.test_connection(conn1, stuPurchase)
-
-
-    #able to succcessfully connect
-    if conn:
-        cursor = conn.cursor()
-        DBfunc.createCurrentDatabase(cursor)
-        #query = ["rock", "10", "1", "1.1", "1", "5", "1"]
-        #DBfunc.add(conn, cursor, query)
-        DBfunc.printTable(cursor)
-        DBfunc.checkLowStock(cursor, 10)
-
-
-    if conn1:
-        cursor = conn1.cursor()
-        DBfunc.createPurchaseDatabase(cursor)
-        DBfunc.purchaseItem(conn1, cursor, "beans", 2, "000000")
-
-
-        DBfunc.printTable(cursor)
-"""
+# Print the updated purchase database
+print("40 randomized purchases added successfully!")

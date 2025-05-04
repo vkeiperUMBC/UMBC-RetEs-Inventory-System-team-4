@@ -1,9 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Button, Box,
     AppBar, Toolbar, Typography, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+const fetchData = async (setRows, createData) => {
+    try {
+        const response = await fetch('http://localhost:5000/api/inventory', {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const formattedData = data.map(item =>
+                createData(
+                    item.name || '', // Default to empty string if name is missing
+                    item.stock || 0, // Default to 0 if stock is missing
+                    item.maxWithdraw || 0, // Default to 0 if maxWithdraw is missing
+                    item.stockWeight || 0, // Default to 0 if stockWeight is missing
+                    item.maxWithdrawWeight || 0 // Default to 0 if maxWithdrawWeight is missing
+                )
+            );
+            setRows(formattedData);
+        } else {
+            console.error('Failed to fetch inventory data');
+        }
+    } catch (error) {
+        console.error('Error fetching inventory data:', error);
+    }
+};
 
 export function InventoryAdmin() {
     const navigate = useNavigate();
@@ -12,27 +38,12 @@ export function InventoryAdmin() {
         return { name, stock, maxWithdraw, stockWeight, maxWithdrawWeight };
     };
 
-    const [rows, setRows] = useState([
-        createData('Beans', 10, 5, 50, 25),
-        createData('Rice', 5, 2, 20, 10),
-        createData('Ramen', 20, 10, 40, 20),
-        createData('Soap', 15, 5, 0, 0),
-        createData('Shampoo', 8, 3, 0, 0),
-        createData('Lentils', 12, 6, 30, 15),
-        createData('Pasta', 25, 12, 50, 25),
-        createData('Oats', 18, 9, 40, 20),
-        createData('Canned Tuna', 30, 15, 60, 30),
-        createData('Cereal', 20, 10, 50, 25),
-    ]);
-
-    const [initialRows, setInitialRows] = useState([...rows]); // Baseline state for comparison
+    const [rows, setRows] = useState([]);
+    const [initialRows, setInitialRows] = useState([]); // Baseline state for comparison
     const [modifiedFields, setModifiedFields] = useState({}); // Tracks modified fields
     const [newlyAddedRows, setNewlyAddedRows] = useState([]); // Tracks newly added rows
-
     const [filters, setFilters] = useState({ searchQuery: '' });
-
     const [openDialog, setOpenDialog] = useState(false);
-
     const [newItem, setNewItem] = useState({
         name: '',
         stock: '',
@@ -41,9 +52,19 @@ export function InventoryAdmin() {
         maxWithdrawWeight: '',
     });
 
+    // Fetch inventory data on component load
+    useEffect(() => {
+        fetchData(setRows, createData);
+    }, []);
+
     const handleInputChange = (index, field, value) => {
         const newRows = [...rows];
         const newValue = parseFloat(value) || 0;
+
+        // Ensure the row exists
+        if (!newRows[index]) {
+            newRows[index] = {};
+        }
 
         // Update the specific field
         newRows[index][field] = newValue;
@@ -51,7 +72,11 @@ export function InventoryAdmin() {
         // Track the modified field based on comparison with initialRows
         setModifiedFields((prev) => ({
             ...prev,
-            [`${index}-${field}`]: newValue > initialRows[index][field] ? 'increased' : newValue < initialRows[index][field] ? 'decreased' : 'unchanged',
+            [`${index}-${field}`]: newValue > (initialRows[index]?.[field] || 0)
+                ? 'increased'
+                : newValue < (initialRows[index]?.[field] || 0)
+                ? 'decreased'
+                : 'unchanged',
         }));
 
         setRows(newRows);
@@ -74,17 +99,65 @@ export function InventoryAdmin() {
         return {};
     };
 
-    const handleAddItem = () => {
-        setRows([...rows, createData(
-            newItem.name,
-            parseInt(newItem.stock, 10),
-            parseInt(newItem.maxWithdraw, 10),
-            parseFloat(newItem.stockWeight),
-            parseFloat(newItem.maxWithdrawWeight)
-        )]);
-        setNewlyAddedRows([...newlyAddedRows, rows.length]); // Add the index of the new row
-        setNewItem({ name: '', stock: '', maxWithdraw: '', stockWeight: '', maxWithdrawWeight: '' });
+    const handleAddItem = async () => {
+        const newItemData = {
+            name: newItem.name,
+            stock: parseInt(newItem.stock, 10),
+            maxWithdraw: parseInt(newItem.maxWithdraw, 10),
+            servingWeight: parseFloat(newItem.servingWeight),
+            servingAmount: parseInt(newItem.servingAmount, 10),
+            maxWithdrawWeight: parseFloat(newItem.maxWithdrawWeight),
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/api/addItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newItemData),
+            });
+
+            if (response.ok) {
+                alert('Item added successfully!');
+                // Refresh the inventory after adding the item
+                fetchData(setRows, createData);
+            } else {
+                console.error('Failed to add item');
+                alert('Failed to add item');
+            }
+        } catch (error) {
+            console.error('Error adding item:', error);
+            alert('An error occurred while adding the item');
+        }
+
+        // Reset the dialog and new item state
+        setNewItem({ name: '', stock: '', maxWithdraw: '', servingWeight: '', servingAmount: '', maxWithdrawWeight: '' });
         setOpenDialog(false);
+    };
+
+    const handleRemoveItem = async (itemName) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/removeItem', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: itemName }),
+            });
+
+            if (response.ok) {
+                alert(`Item "${itemName}" removed successfully!`);
+                // Refresh the inventory after removing the item
+                fetchData(setRows, createData);
+            } else {
+                console.error('Failed to remove item');
+                alert('Failed to remove item');
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+            alert('An error occurred while removing the item');
+        }
     };
 
     const handleLogout = () => {
@@ -101,6 +174,39 @@ export function InventoryAdmin() {
         }
     };
 
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            alert('No file selected');
+            return;
+        }
+
+        // Rename the file to "excel"
+        const renamedFile = new File([file], "excel.xlsx", { type: file.type });
+
+        const formData = new FormData();
+        formData.append('file', renamedFile);
+
+        try {
+            const response = await fetch('http://localhost:5000/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                alert('File uploaded successfully!');
+                // Optionally, refresh the inventory after upload
+                fetchData(setRows, createData);
+            } else {
+                console.error('Failed to upload file');
+                alert('Failed to upload file');
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            alert('An error occurred while uploading the file');
+        }
+    };
+
     const filteredRows = rows.filter(row =>
         row.name.toLowerCase().includes(filters.searchQuery.toLowerCase())
     );
@@ -114,6 +220,9 @@ export function InventoryAdmin() {
                     </Typography>
                     <Button color="inherit" onClick={handleLogout}>
                         Logout
+                    </Button>
+                    <Button color="inherit" onClick={() => navigate('/analytics')}>
+                        Analytics
                     </Button>
                 </Toolbar>
             </AppBar>
@@ -157,12 +266,8 @@ export function InventoryAdmin() {
                                             onChange={(e) => handleInputChange(index, 'maxWithdraw', e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell align="right" style={getCellStyle(index, 'stockWeight')}>
-                                        <TextField
-                                            type="number"
-                                            value={row.stockWeight}
-                                            onChange={(e) => handleInputChange(index, 'stockWeight', e.target.value)}
-                                        />
+                                    <TableCell align="right">
+                                        {row.stockWeight} {/* Display-only field */}
                                     </TableCell>
                                     <TableCell align="right" style={getCellStyle(index, 'maxWithdrawWeight')}>
                                         <TextField
@@ -178,17 +283,7 @@ export function InventoryAdmin() {
                                             onClick={() => {
                                                 const confirmDelete = window.confirm(`Are you sure you want to remove "${row.name}" from the inventory?`);
                                                 if (confirmDelete) {
-                                                    const newRows = rows.filter((_, i) => i !== index);
-                                                    setRows(newRows);
-
-                                                    // Remove related modified fields
-                                                    const updatedModifiedFields = { ...modifiedFields };
-                                                    Object.keys(updatedModifiedFields).forEach((key) => {
-                                                        if (key.startsWith(`${index}-`)) {
-                                                            delete updatedModifiedFields[key];
-                                                        }
-                                                    });
-                                                    setModifiedFields(updatedModifiedFields);
+                                                    handleRemoveItem(row.name);
                                                 }
                                             }}
                                         >
@@ -216,6 +311,21 @@ export function InventoryAdmin() {
                         onClick={handleCommitChanges}
                     >
                         Commit Changes
+                    </Button>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', marginTop: 2 }}>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        color='primary'
+                    >
+                        Upload Excel
+                        <input
+                            type="file"
+                            accept=".xlsx, .xls"
+                            hidden
+                            onChange={(e) => handleFileUpload(e)}
+                        />
                     </Button>
                 </Box>
             </Box>
@@ -248,15 +358,23 @@ export function InventoryAdmin() {
                         onChange={(e) => setNewItem({ ...newItem, maxWithdraw: e.target.value })}
                     />
                     <TextField
-                        label="Stock Weight (lbs)"
+                        label="Weight per Serving"
                         type="number"
                         fullWidth
                         margin="dense"
-                        value={newItem.stockWeight}
-                        onChange={(e) => setNewItem({ ...newItem, stockWeight: e.target.value })}
+                        value={newItem.servingWeight}
+                        onChange={(e) => setNewItem({ ...newItem, servingWeight: e.target.value })}
                     />
                     <TextField
-                        label="Max Withdraw Weight (lbs)"
+                        label="Serving Per Stock"
+                        type="number"
+                        fullWidth
+                        margin="dense"
+                        value={newItem.servingAmount}
+                        onChange={(e) => setNewItem({ ...newItem, servingAmount: e.target.value })}
+                    />
+                    <TextField
+                        label="Max Withdraw Weight"
                         type="number"
                         fullWidth
                         margin="dense"

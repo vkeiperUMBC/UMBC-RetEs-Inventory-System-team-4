@@ -2,9 +2,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import backFunc
+import os
+import pandas as pd
+
 
 app = Flask(__name__)
 CORS(app)  #Enable CORS for all routes
+UPLOAD_FOLDER = './uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 #Store the latest data in memory
 latest_data = {"text": ""}
@@ -14,9 +19,7 @@ users = {
     "testuser": "password123",  # username: password
     "admin": "adminpass"
 }
-
-# @app.before_request
-# def innitConn():
+   
    
    
 @app.route('/api/data', methods=['POST'])
@@ -86,6 +89,119 @@ def getInv():
         print(f"Error while loading inventory: {e}")
         return jsonify({"error": "An error occurred while loading inventory"}), 500
 
+@app.route('/api/checkout', methods=['DELETE'])
+def checkout():
+    try:
+        data = request.json
+        i = 0
+        for item in data:
+            itemName = data[i]['name']
+            quantity = data[i]['stock']
+            backFunc.purchase(itemName, quantity, users['testuser'])
+            i = i+1
 
+    except Exception as e:
+        print(f"Error while checking out: {e}")
+        return jsonify({"error": "An error occurred while attempting to checkout"}), 500
+
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        # Save the file to the server
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
+        
+        
+        # Wait until the Excel file is saved and exists
+        while not os.path.exists(file_path):
+            pass
+        
+                
+        backFunc.overrideExcel()
+
+        return jsonify({"message": "File uploaded and processed successfully"}), 200
+    except Exception as e:
+        print(f"Error uploading file: {e}")
+        return jsonify({"error": "An error occurred while uploading the file"}), 500
+
+@app.route('/api/addItem', methods=['POST'])
+def add_item():
+    try:
+        # Parse the JSON request body
+        data = request.json
+
+        # Extract item details
+        item_name = data.get('name')
+        stock = int(data.get('stock', 0))
+        max_withdraw = int(data.get('maxWithdraw', 0))
+        serving_weight = float(data.get('servingWeight', 0))
+        serving_per_stock = int(data.get('servingAmount', 0))  # Fixed key
+        max_withdraw_weight = float(data.get('maxWithdrawWeight', 0))  # Fixed key
+
+        # Prepare the item data for the database
+        to_add = [item_name, stock, 0, serving_weight, serving_per_stock, max_withdraw, max_withdraw_weight]
+
+        # Call the backFunc.addItem function to add the item to the database
+        backFunc.addItem(to_add)
+
+        return jsonify({"message": "Item added successfully"}), 200
+    except Exception as e:
+        print(f"Error while adding item: {e}")
+        return jsonify({"error": "An error occurred while adding the item"}), 500
+
+@app.route('/api/removeItem', methods=['DELETE'])
+def remove_item():
+    try:
+        # Parse the JSON request body
+        data = request.json
+
+        # Extract the item name
+        item_name = data.get('name')
+        if not item_name:
+            return jsonify({"error": "Item name is required"}), 400
+
+        # Call the backFunc.removeItem function to remove the item from the database
+        backFunc.removeItem(item_name)
+
+        return jsonify({"message": f"Item '{item_name}' removed successfully"}), 200
+    except Exception as e:
+        print(f"Error while removing item: {e}")
+        return jsonify({"error": "An error occurred while removing the item"}), 500
+
+@app.route('/api/purchases', methods=['GET'])
+def get_purchases():
+    try:
+        connStu = backFunc.connectStuPurchase()
+        cursorStu = connStu.cursor()
+
+        # Fetch all purchase records
+        cursorStu.execute("SELECT * FROM purchase_database")
+        purchases = cursorStu.fetchall()
+
+        # Format the data as a list of dictionaries
+        formatted_purchases = [
+            {
+                "student_id": row[0],
+                "item_name": row[1],
+                "purchase_date": row[2],
+                "day_of_week": row[3],
+                "purchase_quantity": row[4]
+            }
+            for row in purchases
+        ]
+
+        connStu.close()
+        return jsonify(formatted_purchases), 200
+    except Exception as e:
+        print(f"Error while fetching purchases: {e}")
+        return jsonify({"error": "An error occurred while fetching purchases"}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)

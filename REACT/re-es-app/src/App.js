@@ -7,7 +7,7 @@ import { ShadowTest } from './pages/shadowTest';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Inventory } from './pages/inventory';
 import { InventoryAdmin } from './pages/inventoryAdmin';
-import { Analytics } from './pages/analytics';
+import Analytics from './pages/analytics'; // Use default import
 
 const theme = createTheme({
   palette: {

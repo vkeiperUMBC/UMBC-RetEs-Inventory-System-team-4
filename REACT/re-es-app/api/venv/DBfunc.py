@@ -32,6 +32,8 @@ def createCurrentDatabase(cursor):
 # interprets an excel file and populates the table with the data
 #overwrites preexisting file
 def createExcelDatabase(cursor, excel_file):
+    
+    print("do we get here???")
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS current_database (
             item_name TEXT PRIMARY KEY,
@@ -44,8 +46,12 @@ def createExcelDatabase(cursor, excel_file):
         )
     ''')
     
+    print("do we get here")
+    
     # Read data from the Excel file and insert it into the database
     try:
+        
+        print("dfshjidfs")
         data = pd.read_excel(excel_file)
         for _, row in data.iterrows():
             cursor.execute('''
